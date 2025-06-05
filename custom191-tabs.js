@@ -19,6 +19,12 @@
       { '担当者名': '田中', '売上金額': 1150000, '売上予算': 1200000, '加工高': 570000, '加工高予算': 600000, '加工高率': '49.6%', '加工高達成率': '95%' }
     ];
 
+    const customerData = [
+      { '得意先名': 'A商事', '売上金額': 1000000, '外注費': 300000, '用紙費': 100000 },
+      { '得意先名': 'B工業', '売上金額': 800000, '外注費': 250000, '用紙費': 80000 },
+      { '得意先名': 'C販売', '売上金額': 600000, '外注費': 200000, '用紙費': 70000 }
+    ];
+
     const createTable = (data) => {
       const container = document.createElement('div');
       container.style.width = '100%';
@@ -58,6 +64,68 @@
           td.style.textAlign = 'center';
           td.style.padding = '6px';
           td.style.backgroundColor = ['加工高予算', '加工高', '加工高率', '加工高達成率'].includes(key)
+            ? (isOdd ? '#ffe0b3' : '#fff')
+            : (isOdd ? '#e6f3ff' : '#fff');
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      container.appendChild(table);
+      return container;
+    };
+
+    const createCustomerTable = (data) => {
+      const container = document.createElement('div');
+      container.style.width = '100%';
+      container.style.overflowX = 'auto';
+      container.style.marginTop = '6px';
+
+      const table = document.createElement('table');
+      table.style.width = '100%';
+      table.style.borderCollapse = 'collapse';
+
+      const headers = ['得意先名', '売上金額', '外注費', '用紙費', '原価合計', '利益合計', '利益率'];
+      const thead = document.createElement('thead');
+      const tr = document.createElement('tr');
+      headers.forEach(key => {
+        const th = document.createElement('th');
+        th.innerText = key;
+        th.style.border = '1px solid #ccc';
+        th.style.textAlign = 'center';
+        th.style.padding = '6px';
+        th.style.backgroundColor = ['外注費', '用紙費', '原価合計', '利益合計', '利益率'].includes(key) ? '#ffcc66' : '#3399ff';
+        th.style.color = ['外注費', '用紙費', '原価合計', '利益合計', '利益率'].includes(key) ? '#000' : '#fff';
+        tr.appendChild(th);
+      });
+      thead.appendChild(tr);
+      table.appendChild(thead);
+
+      const tbody = document.createElement('tbody');
+      data.forEach((row, idx) => {
+        const tr = document.createElement('tr');
+        const isOdd = idx % 2 === 1;
+        const cost = row['外注費'] + row['用紙費'];
+        const profit = row['売上金額'] - cost;
+        const rate = row['売上金額'] ? ((profit / row['売上金額']) * 100).toFixed(1) + '%' : '0%';
+        const values = {
+          '得意先名': row['得意先名'],
+          '売上金額': row['売上金額'],
+          '外注費': row['外注費'],
+          '用紙費': row['用紙費'],
+          '原価合計': cost,
+          '利益合計': profit,
+          '利益率': rate
+        };
+        headers.forEach(key => {
+          const td = document.createElement('td');
+          const val = values[key];
+          const showVal = typeof val === 'number' ? formatNumber(val) : val;
+          td.innerText = showVal;
+          td.style.border = '1px solid #ccc';
+          td.style.textAlign = 'center';
+          td.style.padding = '6px';
+          td.style.backgroundColor = ['外注費', '用紙費', '原価合計', '利益合計', '利益率'].includes(key)
             ? (isOdd ? '#ffe0b3' : '#fff')
             : (isOdd ? '#e6f3ff' : '#fff');
           tr.appendChild(td);
@@ -128,7 +196,7 @@
           <button data-tab="month">年月別</button>
         </div>
         <div id="tab-staff" class="tab-content"></div>
-        <div id="tab-dummy1" class="tab-content"><p>得意先別：今後対応</p></div>
+        <div id="tab-dummy1" class="tab-content"></div>
         <div id="tab-dummy2" class="tab-content"><p>品名別：今後対応</p></div>
         <div id="tab-month" class="tab-content"><p>年月別：今後対応</p></div>
       `;
@@ -189,6 +257,30 @@
                 ]
               },
               options: { responsive: false, maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { position: 'top' } }, animation: false }
+            });
+          } else if (tabId === 'dummy1') {
+            const chartWrapper = document.createElement('div');
+            chartWrapper.className = 'chart-wrapper';
+            chartWrapper.innerHTML = `
+              <div>
+                <h4 style="text-align:center;margin:4px 0;">得意先別売上・加工高</h4>
+                <canvas id="customer-chart" width="400" height="260"></canvas>
+              </div>
+            `;
+            content.appendChild(chartWrapper);
+            content.appendChild(createCustomerTable(customerData));
+
+            const labels = customerData.map(d => d['得意先名']);
+            new Chart(document.getElementById('customer-chart').getContext('2d'), {
+              type: 'bar',
+              data: {
+                labels,
+                datasets: [
+                  { label: '売上金額', data: customerData.map(d => d['売上金額'] / 1000), backgroundColor: '#3399ff' },
+                  { label: '加工高', data: customerData.map(d => (d['外注費'] + d['用紙費']) / 1000), backgroundColor: '#ff9966' }
+                ]
+              },
+              options: { responsive: false, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { beginAtZero: true } }, plugins: { legend: { position: 'top' } }, animation: false }
             });
           }
 
