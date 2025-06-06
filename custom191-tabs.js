@@ -1,5 +1,9 @@
 (function () {
   "use strict";
+  console.log("✅ custom191-tabs.js が読み込まれました");
+})();
+(function () {
+  "use strict";
 
   console.log("✅ custom191-tabs.js が読み込まれました");
 
