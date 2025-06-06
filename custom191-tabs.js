@@ -1,12 +1,6 @@
 (function () {
   "use strict";
   console.log("✅ custom191-tabs.js が読み込まれました");
-})();
-
-(function () {
-  "use strict";
-
-  console.log("✅ custom191-tabs.js が読み込まれました");
 
   const chartScript = document.createElement("script");
   chartScript.src = "https://cdn.jsdelivr.net/npm/chart.js";
@@ -36,7 +30,6 @@
       container.appendChild(tabWrap);
 
       btn.addEventListener("click", () => renderCustomer(tab));
-
       renderCustomer(tab);
 
       return event;
