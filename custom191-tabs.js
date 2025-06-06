@@ -1,4 +1,4 @@
 (function () {
   "use strict";
-  alert("✅ GitHubのJSファイルはKintoneで実行されています！");
+  alert("✅ custom191-tabs.js is working!");
 })();
